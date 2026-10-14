@@ -1,0 +1,4 @@
+*.sh text eol=lf
+Makefile text eol=lf
+*.y text eol=lf
+*.l text eol=lf

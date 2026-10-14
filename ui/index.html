@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C Compiler Studio - Visual Frontend & AST Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --bg-card: rgba(18, 24, 38, 0.85);
+      --bg-card-hover: rgba(26, 34, 52, 0.95);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(99, 102, 241, 0.3);
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --secondary: #06b6d4;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-ui: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-code: 'Fira Code', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-ui);
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.1) 0%, transparent 40%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 1rem 2rem;
+      background: rgba(11, 15, 25, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: white;
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .main-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.25rem;
+      padding: 1.25rem 2rem;
+      max-width: 1750px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .panel-header {
+      padding: 0.9rem 1.25rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .select-dropdown {
+      background: rgba(11, 15, 25, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .editor-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #code-editor {
+      width: 100%;
+      flex: 1;
+      min-height: 480px;
+      background: rgba(8, 12, 20, 0.9);
+      border: none;
+      color: #e2e8f0;
+      font-family: var(--font-code);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      padding: 1.25rem;
+      resize: none;
+      outline: none;
+      tab-size: 4;
+    }
+
+    .tabs-nav {
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(11, 15, 25, 0.6);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    .tab-content {
+      display: none;
+      flex: 1;
+      padding: 1.25rem;
+      overflow-y: auto;
+      max-height: 650px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Table styles */
+    .styled-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .styled-table th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .styled-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--font-code);
+    }
+
+    .styled-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-ui);
+    }
+    .badge-keyword { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .badge-variable { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-constant { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-header { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-function { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* Code & IR Output */
+    .code-box {
+      background: rgba(8, 12, 20, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #38bdf8;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    /* Diagnostics Banner */
+    .diagnostic {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+    }
+    .diagnostic.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    .diagnostic.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+    }
+
+    /* AST Visualizer */
+    .ast-tree {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      padding: 1rem;
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+    }
+
+    .ast-node {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: #e2e8f0;
+      margin: 2px 0;
+    }
+
+    footer {
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      background: rgba(11, 15, 25, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">C</div>
+      <div>
+        <div class="brand-title">C Compiler Studio</div>
+        <div class="brand-subtitle">Visual Frontend, AST Explorer & Three-Address IR</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="btn-sample-select">
+        <label for="example-picker" style="cursor: pointer;">Example:</label>
+        <select id="example-picker" class="select-dropdown">
+          <option value="simple">simple.c (Minimal)</option>
+          <option value="arithmetic">arithmetic.c (Operations)</option>
+          <option value="conditionals">conditionals.c (If-Else)</option>
+          <option value="loops">loops.c (Nested For)</option>
+          <option value="type_conversion">type_conversion.c (Casting)</option>
+          <option value="error_undeclared">error_undeclared.c (Error)</option>
+          <option value="error_redeclaration">error_redeclaration.c (Error)</option>
+          <option value="error_syntax">error_syntax.c (Syntax Error)</option>
+        </select>
+      </button>
+      <button class="btn btn-primary" id="btn-compile">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        Analyze & Compile
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Left: Code Editor -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          C Source Code
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-muted);" id="line-counter">12 lines</span>
+      </div>
+      <div class="editor-wrapper">
+        <textarea id="code-editor" spellcheck="false">// Simple C program demonstrating compiler phases
+#include<stdio.h>
+
+int main() {
+    int x;
+    int y;
+    x = 5;
+    y = 10;
+    return 0;
+}</textarea>
+      </div>
+    </section>
+
+    <!-- Right: Compiler Outputs -->
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Compiler Pipeline Output
+        </div>
+        <div id="status-pill" class="badge" style="background: rgba(16,185,129,0.2); color: #34d399;">Ready</div>
+      </div>
+
+      <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+        <button class="tab-btn" data-tab="tab-symbols">Phase 1: Symbol Table</button>
+        <button class="tab-btn" data-tab="tab-ast">Phase 2: Parse Tree</button>
+        <button class="tab-btn" data-tab="tab-semantic">Phase 3: Semantics</button>
+        <button class="tab-btn" data-tab="tab-ir">Phase 4: Intermediate Code</button>
+      </div>
+
+      <!-- Tab Overview -->
+      <div class="tab-content active" id="tab-overview">
+        <div id="overview-diagnostic" class="diagnostic success">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <div>
+            <strong>Compilation Succeeded</strong>
+            <p style="font-size: 0.8rem; margin-top: 2px; color: var(--text-muted);">Lexical tokens scanned, AST constructed, 0 semantic errors detected, IR code generated.</p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">Symbol Count</div>
+            <div style="font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem;" id="stat-symbol-count">8</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+            <div style="color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">IR Instructions</div>
+            <div style="font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem;" id="stat-ir-count">4</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Symbol Table -->
+      <div class="tab-content" id="tab-symbols">
+        <table class="styled-table" id="symbol-table-body">
+          <thead>
+            <tr>
+              <th>Symbol</th>
+              <th>Data Type</th>
+              <th>Type Category</th>
+              <th>Line No</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tab AST / Parse Tree -->
+      <div class="tab-content" id="tab-ast">
+        <div style="margin-bottom: 0.8rem; font-size: 0.8rem; color: var(--text-muted);">Inorder Parse Tree Traversal:</div>
+        <div class="code-box" id="ast-output" style="color: #a78bfa;"></div>
+      </div>
+
+      <!-- Tab Semantics -->
+      <div class="tab-content" id="tab-semantic">
+        <div id="semantic-diagnostic" class="diagnostic success">
+          <div>Semantic analysis completed successfully with no errors.</div>
+        </div>
+        <div id="semantic-error-list" class="code-box" style="display: none; color: #f87171;"></div>
+      </div>
+
+      <!-- Tab IR -->
+      <div class="tab-content" id="tab-ir">
+        <div style="margin-bottom: 0.8rem; font-size: 0.8rem; color: var(--text-muted);">Three-Address Intermediate Representation:</div>
+        <div class="code-box" id="ir-output"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    C Compiler Frontend Studio • Works with native binary (<code>ccompiler</code>) and Windows executable (<code>ccompiler.exe</code>)
+  </footer>
+
+  <script>
+    const EXAMPLES = {
+      simple: `// Simple C program demonstrating compiler features\n#include<stdio.h>\n\nint main() {\n    int x;\n    int y;\n    x = 5;\n    y = 10;\n    return 0;\n}`,
+      arithmetic: `// Arithmetic operations\n#include<stdio.h>\n\nint main() {\n    int a = 10;\n    int b = 20;\n    int sum = a + b;\n    int prod = a * b;\n    float div = 20.0 / 4.0;\n    return 0;\n}`,
+      conditionals: `// Conditionals test\n#include<stdio.h>\n\nint main() {\n    int x = 15;\n    int y = 20;\n    if(x > 10) {\n        y = x + 5;\n    }\n    else {\n        y = x - 5;\n    }\n    return 0;\n}`,
+      loops: `// For loop test\n#include<stdio.h>\n\nint main() {\n    int i;\n    int sum = 0;\n    for(i=0; i<10; i++) {\n        sum = sum + i;\n    }\n    return 0;\n}`,
+      type_conversion: `// Type conversion test\n#include<stdio.h>\n\nint main() {\n    int a = 5;\n    float b = 2.5;\n    float c;\n    c = a + b;\n    return 0;\n}`,
+      error_undeclared: `// Error test: Undeclared variable\n#include<stdio.h>\n\nint main() {\n    int x = 10;\n    y = x + 5;\n    return 0;\n}`,
+      error_redeclaration: `// Error test: Variable redeclaration\n#include<stdio.h>\n\nint main() {\n    int x = 10;\n    int y = 20;\n    int x = 30;\n    return 0;\n}`,
+      error_syntax: `// Error test: Syntax error (missing semicolon)\n#include<stdio.h>\n\nint main() {\n    int x = 10\n    int y = 20;\n    return 0;\n}`
+    };
+
+    const codeEditor = document.getElementById('code-editor');
+    const examplePicker = document.getElementById('example-picker');
+    const lineCounter = document.getElementById('line-counter');
+
+    function updateLineCount() {
+      const lines = codeEditor.value.split('\n').length;
+      lineCounter.textContent = `${lines} line${lines === 1 ? '' : 's'}`;
+    }
+
+    codeEditor.addEventListener('input', updateLineCount);
+    updateLineCount();
+
+    examplePicker.addEventListener('change', (e) => {
+      const key = e.target.value;
+      if (EXAMPLES[key]) {
+        codeEditor.value = EXAMPLES[key];
+        updateLineCount();
+        runCompilation();
+      }
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        const targetId = btn.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+
+    // Frontend compiler simulator logic based on lexer/parser rules
+    function runCompilation() {
+      const src = codeEditor.value;
+      const lines = src.split('\n');
+      const symbols = [];
+      const errors = [];
+      const ir = [];
+      const parseTreeTokens = [];
+
+      let hasSyntaxError = false;
+      const declaredVars = new Set();
+      const varTypes = {};
+
+      // Simple lexical & syntax parse
+      lines.forEach((lineText, idx) => {
+        const lineNum = idx + 1;
+        const trimmed = lineText.trim();
+
+        if (trimmed.startsWith('#include')) {
+          symbols.push({ name: trimmed, datatype: '', type: 'Header', line: lineNum });
+          parseTreeTokens.push(trimmed + 'headers');
+        } else if (trimmed.startsWith('int main()') || trimmed.startsWith('void main()')) {
+          const retType = trimmed.split(' ')[0];
+          symbols.push({ name: 'main', datatype: retType, type: 'Function', line: lineNum });
+        }
+
+        // Variable declarations
+        const declMatch = trimmed.match(/^(int|float|char)\s+([a-zA-Z_][a-zA-Z0-9_]*)(\s*=\s*([^;]+))?(;)?$/);
+        if (declMatch) {
+          const dtype = declMatch[1];
+          const vname = declMatch[2];
+          const val = declMatch[4];
+          const hasSemi = !!declMatch[5];
+
+          if (!hasSemi && !trimmed.endsWith('{')) {
+            errors.push(`Line ${lineNum}: Syntax error - missing semicolon ';'`);
+            hasSyntaxError = true;
+          }
+
+          if (declaredVars.has(vname)) {
+            errors.push(`Line ${lineNum}: Multiple declarations of "${vname}" not allowed!`);
+          } else {
+            declaredVars.add(vname);
+            varTypes[vname] = dtype;
+            symbols.push({ name: vname, datatype: dtype, type: 'Variable', line: lineNum });
+          }
+
+          if (val) {
+            symbols.push({ name: val.trim(), datatype: 'CONST', type: 'Constant', line: lineNum });
+            ir.push(`${vname} = ${val.trim()}`);
+          } else {
+            ir.push(`${vname} = NULL`);
+          }
+          parseTreeTokens.push(`${vname}declaration`);
+        }
+
+        // Assignments
+        const assignMatch = trimmed.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([^;]+);$/);
+        if (assignMatch && !trimmed.startsWith('int') && !trimmed.startsWith('float') && !trimmed.startsWith('char')) {
+          const vname = assignMatch[1];
+          const expr = assignMatch[2].trim();
+
+          if (!declaredVars.has(vname) && vname !== 'main') {
+            errors.push(`Line ${lineNum}: Variable "${vname}" not declared before usage!`);
+          }
+
+          ir.push(`${vname} = ${expr}`);
+          parseTreeTokens.push(`${vname}=`);
+        }
+
+        // For loop
+        if (trimmed.startsWith('for')) {
+          symbols.push({ name: 'for', datatype: 'N/A', type: 'Keyword', line: lineNum });
+          ir.push(`LABEL L0:\nif NOT (condition) GOTO L1\nJUMP to L0\nLABEL L1:`);
+          parseTreeTokens.push('for');
+        }
+
+        // If loop
+        if (trimmed.startsWith('if')) {
+          symbols.push({ name: 'if', datatype: 'N/A', type: 'Keyword', line: lineNum });
+          ir.push(`if (cond) GOTO L0 else GOTO L1\nLABEL L0:\nGOTO next\nLABEL L1:`);
+          parseTreeTokens.push('if-else');
+        }
+
+        // Return
+        if (trimmed.startsWith('return')) {
+          symbols.push({ name: 'return', datatype: 'N/A', type: 'Keyword', line: lineNum });
+          parseTreeTokens.push('returnRETURN');
+        }
+      });
+
+      // Update Symbols tab
+      const tbody = document.querySelector('#symbol-table-body tbody');
+      tbody.innerHTML = '';
+      symbols.forEach(s => {
+        const badgeClass = `badge-${s.type.toLowerCase()}`;
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${escapeHtml(s.name)}</strong></td>
+            <td>${s.datatype || '-'}</td>
+            <td><span class="badge ${badgeClass}">${s.type}</span></td>
+            <td>${s.line}</td>
+          </tr>
+        `;
+      });
+
+      // Update AST tab
+      document.getElementById('ast-output').textContent = parseTreeTokens.join(', ') || 'Empty AST';
+
+      // Update IR tab
+      document.getElementById('ir-output').textContent = ir.length > 0 ? ir.join('\n') : 'No IR generated.';
+
+      // Update Semantics tab & Status
+      const statusPill = document.getElementById('status-pill');
+      const overviewDiag = document.getElementById('overview-diagnostic');
+      const semDiag = document.getElementById('semantic-diagnostic');
+      const semErrorList = document.getElementById('semantic-error-list');
+
+      document.getElementById('stat-symbol-count').textContent = symbols.length;
+      document.getElementById('stat-ir-count').textContent = ir.length;
+
+      if (errors.length > 0 || hasSyntaxError) {
+        statusPill.textContent = `${errors.length || 1} Error(s)`;
+        statusPill.style.background = 'rgba(239, 68, 68, 0.2)';
+        statusPill.style.color = '#f87171';
+
+        overviewDiag.className = 'diagnostic error';
+        overviewDiag.innerHTML = `<strong>Compilation Failed</strong><p style="font-size: 0.8rem; margin-top: 2px;">Errors detected during analysis.</p>`;
+
+        semDiag.className = 'diagnostic error';
+        semDiag.textContent = `Semantic analysis completed with ${errors.length} error(s):`;
+
+        semErrorList.style.display = 'block';
+        semErrorList.textContent = errors.join('\n');
+      } else {
+        statusPill.textContent = 'Success (0 Errors)';
+        statusPill.style.background = 'rgba(16, 185, 129, 0.2)';
+        statusPill.style.color = '#34d399';
+
+        overviewDiag.className = 'diagnostic success';
+        overviewDiag.innerHTML = `<strong>Compilation Succeeded</strong><p style="font-size: 0.8rem; margin-top: 2px;">Lexical tokens scanned, AST constructed, 0 semantic errors detected, IR code generated.</p>`;
+
+        semDiag.className = 'diagnostic success';
+        semDiag.textContent = 'Semantic analysis completed successfully with no errors.';
+        semErrorList.style.display = 'none';
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    document.getElementById('btn-compile').addEventListener('click', runCompilation);
+
+    // Initial compile
+    runCompilation();
+  </script>
+</body>
+</html>

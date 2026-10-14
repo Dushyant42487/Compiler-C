@@ -1,0 +1,30 @@
+# Build directories and outputs
+build/
+dist/
+*.o
+*.out
+*.exe
+nul
+
+# Parser and Lexer generated files
+compiler/lex.yy.c
+compiler/y.tab.c
+compiler/y.tab.h
+compiler/y.output
+compiler/*.output
+lex.yy.c
+y.tab.c
+y.tab.h
+y.output
+
+# OS & Editor files
+.DS_Store
+*.swp
+*~
+
+# Node.js and Web Build
+node_modules/
+backend/dist/
+frontend/dist/
+.env
+*.log

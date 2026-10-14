@@ -1,0 +1,32 @@
+name: Native compiler checks
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y flex bison gcc make
+      - run: make test
+      - run: bash build-linux.sh
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        id: msys2
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc flex bison
+      - shell: pwsh
+        env:
+          MSYS2_LOCATION: ${{ steps.msys2.outputs.msys2-location }}
+        run: |
+          # Resolve the action's installation rather than assuming a drive.
+          $msysRoot = $env:MSYS2_LOCATION
+          $env:PATH = "$msysRoot\ucrt64\bin;$msysRoot\usr\bin;$env:PATH"
+          ./build-windows.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/run-tests-win.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tests/test_regressions.py dist/bin/ccompiler.exe

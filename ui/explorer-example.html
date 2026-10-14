@@ -1,0 +1,59 @@
+<!doctype html><html lang='en'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Compiler Explorer</title><style>body{font:16px system-ui;background:#101827;color:#e5edf9;margin:0}main{max-width:1100px;margin:auto;padding:30px}h1{color:#7ce4c8}section{overflow-x:auto;background:#1b293e;padding:22px;border-radius:14px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere}button,input{padding:9px;margin:5px}table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:8px;border-bottom:1px solid #42536b}summary,button{cursor:pointer}li{margin:6px 0}#ir .active{background:#345b6d;color:#fff}#ir li{padding:6px;font:14px monospace;white-space:pre-wrap}</style><main><h1>Compiler Explorer</h1><p>An offline journey from source to intermediate code.</p><p>Source: examples\arithmetic.c</p><p>Syntax: accepted | Semantic errors: 0 | Symbols: 16 | IR entries: 26</p><section><h2>1. Source</h2><pre>// Arithmetic operations test
+// Tests all basic arithmetic operators and type conversions
+
+#include&lt;stdio.h&gt;
+
+int main() {
+    int a = 10;
+    int b = 20;
+    int sum;
+    int diff;
+    int prod;
+    int quot;
+    
+    // Basic arithmetic
+    sum = a + b;
+    diff = b - a;
+    prod = a * b;
+    quot = b / a;
+    
+    // Float operations
+    float x = 5.5;
+    float y = 2.5;
+    float result;
+    
+    result = x + y;
+    result = x - y;
+    result = x * y;
+    result = x / y;
+    
+    return 1;
+}
+</pre></section><section><h2>2. Symbol detective</h2><p>Search a name, type, or value. Values are frontend estimates, not runtime state.</p><input id='search' aria-label='Filter symbols' placeholder='Find a symbol...'><table id='symbols'><thead><tr><th>Name</th><th>Type</th><th>Kind</th><th>Line</th><th>Estimate</th></tr></thead><tbody><tr><td>#include&lt;stdio.h&gt;</td><td></td><td>Header</td><td>4</td><td>-</td></tr><tr><td>a</td><td>int</td><td>Variable</td><td>7</td><td>10</td></tr><tr><td>10</td><td>CONST</td><td>Constant</td><td>7</td><td>10</td></tr><tr><td>b</td><td>int</td><td>Variable</td><td>8</td><td>20</td></tr><tr><td>20</td><td>CONST</td><td>Constant</td><td>8</td><td>20</td></tr><tr><td>sum</td><td>int</td><td>Variable</td><td>9</td><td>30</td></tr><tr><td>diff</td><td>int</td><td>Variable</td><td>10</td><td>10</td></tr><tr><td>prod</td><td>int</td><td>Variable</td><td>11</td><td>200</td></tr><tr><td>quot</td><td>int</td><td>Variable</td><td>12</td><td>2</td></tr><tr><td>x</td><td>float</td><td>Variable</td><td>21</td><td>5.5</td></tr><tr><td>5.5</td><td>CONST</td><td>Constant</td><td>21</td><td>5.5</td></tr><tr><td>y</td><td>float</td><td>Variable</td><td>22</td><td>2.5</td></tr><tr><td>2.5</td><td>CONST</td><td>Constant</td><td>22</td><td>2.5</td></tr><tr><td>result</td><td>float</td><td>Variable</td><td>23</td><td>2.2000000000000002</td></tr><tr><td>1</td><td>CONST</td><td>Constant</td><td>30</td><td>1</td></tr><tr><td>main</td><td>float</td><td>Function</td><td>31</td><td>-</td></tr></tbody></table></section><section><h2>3. Syntax tree</h2><p>Click a node to fold or unfold its children. This is the frontend's main-function tree.</p><ul><li><details open><summary>main</summary><ul><li><details open><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>statements</summary><ul><li><details><summary>declaration</summary><ul><li><details><summary>a</summary><ul></ul></details></li><li><details><summary>10</summary><ul></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>b</summary><ul></ul></details></li><li><details><summary>20</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>sum</summary><ul></ul></details></li><li><details><summary>NULL</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>diff</summary><ul></ul></details></li><li><details><summary>NULL</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>prod</summary><ul></ul></details></li><li><details><summary>NULL</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>quot</summary><ul></ul></details></li><li><details><summary>NULL</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>sum</summary><ul></ul></details></li><li><details><summary>+</summary><ul><li><details><summary>a</summary><ul></ul></details></li><li><details><summary>b</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>diff</summary><ul></ul></details></li><li><details><summary>-</summary><ul><li><details><summary>b</summary><ul></ul></details></li><li><details><summary>a</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>prod</summary><ul></ul></details></li><li><details><summary>*</summary><ul><li><details><summary>a</summary><ul></ul></details></li><li><details><summary>b</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>quot</summary><ul></ul></details></li><li><details><summary>/</summary><ul><li><details><summary>b</summary><ul></ul></details></li><li><details><summary>a</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>x</summary><ul></ul></details></li><li><details><summary>5.5</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>y</summary><ul></ul></details></li><li><details><summary>2.5</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>declaration</summary><ul><li><details><summary>result</summary><ul></ul></details></li><li><details><summary>NULL</summary><ul></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>result</summary><ul></ul></details></li><li><details><summary>+</summary><ul><li><details><summary>x</summary><ul></ul></details></li><li><details><summary>y</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>result</summary><ul></ul></details></li><li><details><summary>-</summary><ul><li><details><summary>x</summary><ul></ul></details></li><li><details><summary>y</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>result</summary><ul></ul></details></li><li><details><summary>*</summary><ul><li><details><summary>x</summary><ul></ul></details></li><li><details><summary>y</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>=</summary><ul><li><details><summary>result</summary><ul></ul></details></li><li><details><summary>/</summary><ul><li><details><summary>x</summary><ul></ul></details></li><li><details><summary>y</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary>RETURN</summary><ul><li><details><summary>return</summary><ul></ul></details></li><li><details><summary>1</summary><ul></ul></details></li></ul></details></li></ul></details></li></ul></details></li></ul></section><section><h2>4. Diagnostics</h2><pre>No frontend errors detected.
+</pre></section><section><h2>5. IR microscope</h2><p>Step through emitted instructions in source order. This view explains IR; it does not simulate execution or follow jumps. The educational IR is approximate for complex control flow.</p><button id='prev'>Previous</button><button id='next'>Next</button><button id='reset'>Reset</button><p id='position' aria-live='polite'></p><p id='explain'></p><ol id='ir'><li>a = 10
+</li><li>b = 20
+</li><li>sum = NULL
+</li><li>diff = NULL
+</li><li>prod = NULL
+</li><li>quot = NULL
+</li><li>30 = a + b
+</li><li>sum = 30
+</li><li>10 = b - a
+</li><li>diff = 10
+</li><li>200 = a * b
+</li><li>prod = 200
+</li><li>2 = b / a
+</li><li>quot = 2
+</li><li>x = 5.5
+</li><li>y = 2.5
+</li><li>result = NULL
+</li><li>8 = x + y
+</li><li>result = 8
+</li><li>3 = x - y
+</li><li>result = 3
+</li><li>13.75 = x * y
+</li><li>result = 13.75
+</li><li>2.2000000000000002 = x / y
+</li><li>result = 2.2000000000000002
+</li><li>RETURN 1
+</li></ol></section><script>const rows=[...document.querySelectorAll('#symbols tbody tr')];document.querySelector('#search').oninput=e=>rows.forEach(r=>r.hidden=!r.textContent.toLowerCase().includes(e.target.value.toLowerCase()));const instructions=[...document.querySelectorAll('#ir li')];let step=0;function render(){instructions.forEach((r,i)=>r.classList.toggle('active',i===step));document.querySelector('#position').textContent=instructions.length?'Instruction '+(step+1)+' of '+instructions.length:'No IR emitted';const t=instructions[step]?.textContent||'';document.querySelector('#explain').textContent=t.includes('RETURN')?'Return a value to the caller.':t.includes('LABEL')?'A destination for control flow.':/GOTO|JUMP/.test(t)?'Transfer control, possibly depending on a condition.':t.includes('call ')?'Call a function; its effects are determined at runtime.':t.includes('=')?'Compute or assign a value.':'An emitted IR entry.';document.querySelector('#prev').disabled=step===0;document.querySelector('#next').disabled=step>=instructions.length-1;}document.querySelector('#next').onclick=()=>{step=Math.min(step+1,instructions.length-1);render()};document.querySelector('#prev').onclick=()=>{step=Math.max(0,step-1);render()};document.querySelector('#reset').onclick=()=>{step=0;render()};render();</script></main></html>
