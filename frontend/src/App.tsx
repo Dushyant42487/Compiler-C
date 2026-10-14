@@ -6,7 +6,7 @@ import { PhasePipeline } from './components/PhasePipeline';
 import { EditorPanel } from './components/EditorPanel';
 import { ResultsPanel } from './components/ResultsPanel';
 import { SplitPane } from './components/SplitPane';
-import { IseGuideModal } from './components/IseGuideModal';
+import { SpecificationsModal } from './components/SpecificationsModal';
 import { ShortcutsModal } from './components/ShortcutsModal';
 import { ToastContainer, ToastMessage } from './components/Toast';
 import { CODE_EXAMPLES, CodeExample } from './examples/codeExamples';
@@ -25,7 +25,7 @@ export const App: React.FC = () => {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [healthLoading, setHealthLoading] = useState<boolean>(true);
   const [compilerInfo, setCompilerInfo] = useState<CompilerInfoResponse | null>(null);
-  const [showIseGuide, setShowIseGuide] = useState<boolean>(false);
+  const [showSpecs, setShowSpecs] = useState<boolean>(false);
   const [showShortcuts, setShowShortcuts] = useState<boolean>(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [layoutMode, setLayoutMode] = useState<'split' | 'editor-only' | 'results-only'>('split');
@@ -144,7 +144,7 @@ export const App: React.FC = () => {
       // Escape -> close modals
       else if (e.key === 'Escape') {
         setShowShortcuts(false);
-        setShowIseGuide(false);
+        setShowSpecs(false);
       }
       // 1 - 8 to switch results tabs if not focused inside input/textarea
       else if (
@@ -180,8 +180,7 @@ export const App: React.FC = () => {
         health={health}
         healthLoading={healthLoading}
         onRefreshHealth={checkBackend}
-        onOpenIseGuide={() => setShowIseGuide(true)}
-        onOpenSpecs={() => setShowIseGuide(true)}
+        onOpenSpecs={() => setShowSpecs(true)}
         onOpenShortcuts={() => setShowShortcuts(true)}
         layoutMode={layoutMode}
         setLayoutMode={setLayoutMode}
@@ -223,8 +222,7 @@ export const App: React.FC = () => {
         <ActivityBar
           activeView={activeActivityView}
           setActiveView={setActiveActivityView}
-          onOpenIseGuide={() => setShowIseGuide(true)}
-          onOpenSpecs={() => setShowIseGuide(true)}
+          onOpenSpecs={() => setShowSpecs(true)}
           onOpenShortcuts={() => setShowShortcuts(true)}
           health={health}
           healthLoading={healthLoading}
@@ -260,7 +258,7 @@ export const App: React.FC = () => {
                 isCompiling={isCompiling}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
-                onOpenSpecs={() => setShowIseGuide(true)}
+                onOpenSpecs={() => setShowSpecs(true)}
                 onRunBinary={() => handleCompile(true)}
               />
             }
@@ -277,10 +275,10 @@ export const App: React.FC = () => {
         </main>
       </div>
 
-      {/* ISE Guide & Specifications Modal */}
-      <IseGuideModal
-        isOpen={showIseGuide}
-        onClose={() => setShowIseGuide(false)}
+      {/* Compiler Specifications & Architecture Modal */}
+      <SpecificationsModal
+        isOpen={showSpecs}
+        onClose={() => setShowSpecs(false)}
         info={compilerInfo}
       />
 

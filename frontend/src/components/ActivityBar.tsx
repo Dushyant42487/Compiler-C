@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Files,
-  BookOpen,
   Keyboard,
   Cpu,
   Layers,
@@ -14,7 +13,6 @@ export type ActivityView = 'explorer' | 'examples' | 'symbols' | 'none';
 interface ActivityBarProps {
   activeView: ActivityView;
   setActiveView: (view: ActivityView) => void;
-  onOpenIseGuide: () => void;
   onOpenSpecs: () => void;
   onOpenShortcuts: () => void;
   health: HealthResponse | null;
@@ -26,7 +24,6 @@ interface ActivityBarProps {
 export const ActivityBar: React.FC<ActivityBarProps> = ({
   activeView,
   setActiveView,
-  onOpenIseGuide,
   onOpenSpecs,
   onOpenShortcuts,
   health,
@@ -82,15 +79,6 @@ export const ActivityBar: React.FC<ActivityBarProps> = ({
           {activeView === 'examples' && (
             <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-500" />
           )}
-        </button>
-
-        {/* ISE Academic Guide */}
-        <button
-          onClick={onOpenIseGuide}
-          className="p-2.5 rounded-lg text-slate-400 hover:text-cyan-300 hover:bg-white/[0.04] transition-colors"
-          title="ISE Guide & Architecture Reference"
-        >
-          <BookOpen className="w-4 h-4" />
         </button>
 
         {/* Compiler Specifications */}

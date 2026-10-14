@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  BookOpen,
   Keyboard,
   Columns,
   SquareCode,
@@ -15,7 +14,6 @@ interface HeaderProps {
   health: HealthResponse | null;
   healthLoading: boolean;
   onRefreshHealth: () => void;
-  onOpenIseGuide: () => void;
   onOpenSpecs: () => void;
   onOpenShortcuts: () => void;
   layoutMode: 'split' | 'editor-only' | 'results-only';
@@ -29,7 +27,6 @@ export const Header: React.FC<HeaderProps> = ({
   health,
   healthLoading,
   onRefreshHealth,
-  onOpenIseGuide,
   onOpenSpecs,
   onOpenShortcuts,
   layoutMode,
@@ -78,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
                   C Compiler Studio
                 </span>
                 <span className="hidden sm:inline-block text-[10px] px-1.5 py-0.2 rounded font-mono bg-white/[0.05] text-slate-400 border border-white/[0.08]">
-                  ISE 2026
+                  v1.0
                 </span>
               </div>
             </div>
@@ -96,15 +93,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Terminal className="w-3.5 h-3.5 text-primary-400" />
               <span>Compiler</span>
-            </button>
-
-            <button
-              onClick={onOpenIseGuide}
-              className="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-dark-850 transition-colors font-medium flex items-center gap-1.5"
-              title="Open ISE Study Guide & Viva Reference"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
-              <span>ISE Guide</span>
             </button>
 
             <button
